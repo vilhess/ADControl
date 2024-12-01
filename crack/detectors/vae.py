@@ -1,3 +1,6 @@
+import sys 
+sys.path.append('../')
+
 import torch 
 import torch.nn as nn 
 import torch.optim as optim
@@ -6,9 +9,9 @@ from torchvision.utils import make_grid
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-from dataset import CrackDataset
-from model import CVAE
-from loss import LossVAE
+from crack.dataset import CrackDataset
+from crack.models.vae import CVAE
+from crack.loss.loss_vae import LossVAE
 
 DEVICE="cuda"
 BATCH_SIZE=128
