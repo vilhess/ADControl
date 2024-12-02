@@ -11,7 +11,7 @@ transform = Compose([
 ])
 
 class CrackDataset(Dataset):
-    def __init__(self, root="../../Datasets/Crack", train=True, transform=transform):
+    def __init__(self, root="../../../Datasets/Crack", train=True, transform=transform):
         
         self.transform = transform
 

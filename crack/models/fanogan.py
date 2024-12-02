@@ -23,7 +23,7 @@ class ConvGenerator(nn.Module):
         else:
             return nn.Sequential(
                 nn.ConvTranspose2d(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size, stride=stride),
-                nn.Tanh()
+                nn.Sigmoid()
             ) 
         
     def unsqueeze_noise(self, noise):
@@ -56,7 +56,7 @@ class ConvDiscriminator(nn.Module):
             return nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size, stride=stride)
         
     def forward(self, image):
-        return self.disc(image).view(-1, 1)
+        return torch.sigmoid(self.disc(image).view(-1, 1))
 
 class Encoder(nn.Module):
 
