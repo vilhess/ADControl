@@ -28,7 +28,7 @@ LAMBDA=1
 RADIUS=16
 GAMMA=2
 
-for anormal in range(10):
+for anormal in range(6, 10):
 
     ANORMAL=anormal
     print(f'anormal digit = {ANORMAL}')
@@ -38,7 +38,7 @@ for anormal in range(10):
     model = MNIST_LeNet().to(DEVICE)
 
     trainset = TensorDataset(trainset, torch.ones(len(trainset), 1))
-    train_loader = DataLoader(trainset, batch_size=BATCH_SIZE)
+    train_loader = DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True)
 
     test_inputs, test_targets = [], []
     for key, val in test_dict_dataset.items():

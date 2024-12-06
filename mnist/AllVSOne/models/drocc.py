@@ -85,7 +85,12 @@ class DROCCTrainer:
                 # Extract the logits for cross entropy loss
                 logits = self.model(data)
                 logits = torch.squeeze(logits, dim = 1)
+
+                if target.dim()==0:
+                    target = target.view(1)
+
                 ce_loss = F.binary_cross_entropy_with_logits(logits, target)
+
                 # Add to the epoch variable for printing average CE Loss
                 epoch_ce_loss += ce_loss
 
@@ -137,6 +142,8 @@ class DROCCTrainer:
                 new_targets = torch.zeros(batch_size, 1).to(self.device)
                 new_targets = torch.squeeze(new_targets)
                 new_targets = new_targets.to(torch.float)
+                if new_targets.dim()==0:
+                    new_targets = new_targets.view(1)
                 
                 logits = self.model(x_adv_sampled)         
                 logits = torch.squeeze(logits, dim = 1)
