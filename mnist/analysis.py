@@ -20,6 +20,7 @@ def display_images(normal_digit, pb):
         "Linear VAE": f"{pb}/results/figures/vae/mean_scores_{normal_digit}.jpg",
         "Conv VAE": f"{pb}/results/figures/cvae/mean_scores_{normal_digit}.jpg",
         "f-ANOGAN": f"{pb}/results/figures/fanogan/mean_scores_{normal_digit}.jpg",
+        "DROCC": f"{pb}/results/figures/drocc/mean_scores_{normal_digit}.jpg",
     }
     cols = st.columns(2)
     for i, (title, path) in enumerate(images.items()):
@@ -35,6 +36,7 @@ def load_p_values(pb, digit):
         "VAE": f"{pb}/results/p_values/vae/pval_{digit}.json",
         "CVAE": f"{pb}/results/p_values/cvae/pval_{digit}.json",
         "f-ANOGAN": f"{pb}/results/p_values/fanogan/pval_{digit}.json",
+        "DROCC": f"{pb}/results/p_values/drocc/pval_{digit}.json",
     }
     return {model: json.load(open(path)) for model, path in paths.items()}
 

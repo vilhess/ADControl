@@ -17,24 +17,30 @@ MIN_MAX = [(-0.8826567065619495, 9.001545489292527),
            (-0.8280402650205075, 10.581538445782988),
            (-0.7369959242164307, 10.697039838804978)]
 
-def get_mnist(root="../../../../coding/Dataset/", download=False, normal_digit=0, gcn=False):
+def get_mnist(root="/home/svilhes/Bureau/Datasets", download=False, normal_digit=0, gcn=False, drocc=False):
 
     if gcn:
 
         min_value = MIN_MAX[normal_digit][0]
         max_value = MIN_MAX[normal_digit][1]
 
-        transorm = Compose([
+        transform = Compose([
             ToTensor(),
             Lambda(lambda x: global_contrast_normalization(x, scale="l1")),
             Normalize([min_value], [max_value - min_value])
         ])
 
-    else:
-        transorm = ToTensor()
+    elif drocc:
+        transform = Compose([
+            ToTensor(),
+            Normalize([0.1307], [0.3081])
+        ])
 
-    trainset = MNIST(root=root, train=True, download=download, transform=transorm)
-    testset = MNIST(root=root, train=True, download=download, transform=transorm)
+    else:
+        transform = ToTensor()
+
+    trainset = MNIST(root=root, train=True, download=download, transform=transform)
+    testset = MNIST(root=root, train=False, download=download, transform=transform)
     train_dict_dataset = get_dataset_by_digit(trainset)
 
     normal_train = train_dict_dataset[normal_digit]

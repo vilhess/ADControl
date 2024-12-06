@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/Users/samy/Desktop/thèse/code/AnoControl/mnist/AllVSOne/')
+sys.path.append('/home/svilhes/Bureau/these/AnoControl/mnist/AllVSOne/')
 
 import torch 
 import torch.nn as nn

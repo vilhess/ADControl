@@ -7,7 +7,7 @@ from copy import deepcopy
 from utils import get_dataset_by_digit, global_contrast_normalization
 
 
-def get_mnist(root="../../../../coding/Dataset/", download=False, anormal_digit=0, gcn=False):
+def get_mnist(root="/home/svilhes/Bureau/Datasets", download=False, anormal_digit=0, gcn=False, drocc=False):
 
     trainset = MNIST(root=root, train=True, download=download, transform=ToTensor())
     train_dict_dataset = get_dataset_by_digit(trainset)
@@ -45,11 +45,25 @@ def get_mnist(root="../../../../coding/Dataset/", download=False, anormal_digit=
             Lambda(lambda x: global_contrast_normalization(x, scale="l1")),
             Normalize([min_value], [max_value - min_value])
         ])
+
+    elif drocc:
+
+        train_transorm = Compose([
+            Normalize([0.1307], [0.3081])
+        ])
+
+        normal_train = train_transorm(normal_train)
+        normal_val = train_transorm(normal_val)
+
+        test_transorm = Compose([
+            ToTensor(),
+            Normalize([0.1307], [0.3081])
+        ])
     
     else:
         test_transorm = ToTensor()
 
-    testset = MNIST(root=root, train=True, download=download, transform=test_transorm)
+    testset = MNIST(root=root, train=False, download=download, transform=test_transorm)
     test_dict_dataset = get_dataset_by_digit(testset)
 
     return normal_train, normal_val, test_dict_dataset

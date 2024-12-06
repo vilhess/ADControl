@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/Users/samy/Desktop/thèse/code/AnoControl/mnist/AllVSOne/')
+sys.path.append('/home/svilhes/Bureau/these/AnoControl/mnist/AllVSOne/')
 
 import torch 
 import torch.nn as nn
@@ -32,7 +32,7 @@ def weights_init(m):
         torch.nn.init.normal_(m.weight, 0.0, 0.02)
         torch.nn.init.constant_(m.bias, 0)
 
-for anormal in range(2, 10):
+for anormal in range(10):
 
     ANORMAL=anormal
     print(f'anormal digit = {ANORMAL}')

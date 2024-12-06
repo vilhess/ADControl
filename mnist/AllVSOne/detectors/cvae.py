@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/Users/samy/Desktop/thèse/code/AnoControl/mnist/AllVSOne/')
+sys.path.append('/home/svilhes/Bureau/these/AnoControl/mnist/AllVSOne/')
 
 import torch 
 import torch.nn as nn
@@ -15,7 +15,7 @@ from models.cvae import CVAE
 from losses.vae import LossVAE
 from mnist import get_mnist
 
-DEVICE="mps"
+DEVICE="cuda"
 
 LR=3e-4
 BATCH_SIZE=128
