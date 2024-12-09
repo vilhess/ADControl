@@ -70,6 +70,6 @@ for normal in range(10):
         else:
             plt.scatter(z[:,0], z[:,1], c=labels[digit], label=digit)
     plt.legend()
-    plt.title(f"2D latent space - anormal = {NORMAL}.png")
+    plt.title(f"2D latent space - normal = {NORMAL}")
     plt.savefig(f"figures/vae/latent_space_norm_{NORMAL}.png")
     plt.close
