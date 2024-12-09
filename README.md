@@ -97,6 +97,10 @@ In the folder ```crack/```, you will find an example of using a basic Variationa
 
 The folder ```figures/``` contains visual results showcasing the model's performance on both normal and abnormal test samples.
 
-**TO-DO:** Implement the F-AnoGAN model for anomaly detection.
+---
+
+## **Latent space study**
+
+In the folder ```projections```, you will find study on the latent space of both VAE and Deep SVDD. 
 
 ---
