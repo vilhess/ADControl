@@ -7,6 +7,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import roc_auc_score
 from tqdm import trange
 import json
 import os
@@ -54,13 +55,31 @@ for normal in range(10):
     model.eval()
     test_results = {i:None for i in range(10)}
 
+    all_scores=[]
+    all_labels=[]
+
     with torch.no_grad():
         for i in range(10):
             inputs = test_dict_dataset[i].to(DEVICE)
             inputs = inputs.flatten(start_dim=1)
             reconstructed, _, _ = model(inputs)
-            test_score = torch.sum(((inputs - reconstructed)**2), dim=1).mean().item()
-            test_results[i]=test_score
+            test_score = torch.sum(((inputs - reconstructed)**2), dim=1).item()
+            test_results[i]=test_score.mean()
+
+            all_scores.append(-test_score)
+            if i==NORMAL:
+                target = torch.ones(len(test_score))
+            else:
+                target = torch.zeros(len(test_score))
+            all_labels.append(target)
+    all_scores, all_labels = torch.cat(all_scores), torch.cat(all_labels)
+    auc = roc_auc_score(all_labels, all_scores)
+
+    with open('results/roc_auc.json', 'r') as f:
+        results = json.load(f)
+    results["vae"] = auc
+    with open('results/roc_auc.json', 'w') as f:
+        json.dump(results, f)
 
     os.makedirs("results/figures/vae", exist_ok=True)
 
