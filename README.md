@@ -6,7 +6,7 @@ Welcome to the official repository for **AnoControl**, a framework designed to c
 
 ## **Overview**
 
-This repository provides code implementations for AnoControl applied to anomaly detection problems. Current implementations include the **MNIST dataset** and **[Surface Crack Detection dataset](https://www.kaggle.com/datasets/arunrk7/surface-crack-detection)**
+This repository provides code implementations for AnoControl applied to anomaly detection problems. Current implementations include the **MNIST dataset**.
 
 ---
 
@@ -19,6 +19,7 @@ We compare the performance of several state-of-the-art algorithms:
 - [**Deep One-Class Classification**](http://proceedings.mlr.press/v80/ruff18a/ruff18a.pdf)
 - [**F-Anogan**](https://www.sciencedirect.com/science/article/abs/pii/S1361841518302640)
 - **Variational Auto-Encoders** (both linear and convolutional)
+- [**DROCC**](https://arxiv.org/abs/2002.12718)
 
 ---
 
@@ -89,13 +90,6 @@ The `AllvsOne` folder contains the implementations for the **All vs One** framew
   ```bash
   streamlit run analysis.py
   ```
----
-
-## **Surface Crack Detection Dataset**
-
-In the folder ```crack/```, you will find an example of using a basic Variational Autoencoder (VAE) trained exclusively on clean surface images to detect cracks. Unlike UNet-based detection, which requires training on images containing abnormal regions, the VAE approach identifies anomalies through pixel-wise reconstruction loss. This loss highlights discrepancies between the reconstructed and input images, effectively pinpointing abnormal regions. To reject a region, marginal pixel p-values are calculated using a validation set, allowing for precise control over the pixel rejection process.
-
-The folder ```figures/``` contains visual results showcasing the model's performance on both normal and abnormal test samples.
 
 ---
 
