@@ -95,6 +95,6 @@ The `AllvsOne` folder contains the implementations for the **All vs One** framew
 
 ## **Latent space study**
 
-In the folder ```projections```, you will find study on the latent space of both VAE and Deep SVDD. 
+In the folder ```spaces```, you will find study on the latent space of both VAE and Deep SVDD. 
 
 ---
