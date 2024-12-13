@@ -3,6 +3,7 @@ from PIL import Image
 import json
 import pandas as pd
 import numpy as np
+import json
 
 # Configurer la page
 st.set_page_config(layout="wide")
@@ -57,11 +58,30 @@ def compute_results(p_values, threshold, normal_digit, condition_label):
         results.append(digit_results)
     return pd.DataFrame(results)
 
+def load_auc(problem="OneVSAll"):
+
+    with open(f'{problem}/results/roc_auc.json', "r") as f:
+        results = json.load(f)
+
+    df = pd.DataFrame(results)
+    df.index = range(10)
+    if problem=="OneVSAll":
+        df.index.name="Normal digit"
+    else:
+        df.index.name="Anormal digit"
+    pd.set_option('display.float_format', '{:.3f}'.format)
+    return df
+
 # Condition : OneVSAll ou AllVSOne
 if pb == "OneVSAll":
     st.subheader("One class of digit is considered as the normal class")
     st.sidebar.title("Parameters:")
     normal_digit = st.sidebar.slider("Normal digit:", min_value=0, max_value=9, value=0, step=1)
+
+    auc = load_auc(pb)
+    st.header("ROC-AUC Scores (for all digits)")
+    st.table(auc)
+    st.divider()
 
     display_images(normal_digit, pb)
     st.header("Statistical Tests")
@@ -73,6 +93,11 @@ else:
     st.subheader("One class of digit is considered as the anomaly class")
     st.sidebar.title("Parameters:")
     anormal_digit = st.sidebar.slider("Anormal digit:", min_value=0, max_value=9, value=0, step=1)
+
+    auc = load_auc(pb)
+    st.header("ROC-AUC Scores (for all digits)")
+    st.table(auc)
+    st.divider()
 
     display_images(anormal_digit, pb)
     st.header("Statistical Tests")

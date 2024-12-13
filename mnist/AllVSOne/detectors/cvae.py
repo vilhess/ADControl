@@ -7,6 +7,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import roc_auc_score
 from tqdm import trange
 import json
 import os
@@ -53,12 +54,33 @@ for anormal in range(10):
     model.eval()
     test_results = {i:None for i in range(10)}
 
+    all_scores=[]
+    all_labels=[]
+
     with torch.no_grad():
         for i in range(10):
             inputs = test_dict_dataset[i].to(DEVICE)
             reconstructed, _, _ = model(inputs)
-            test_score = torch.sum(((inputs - reconstructed)**2), dim=1).mean().item()
-            test_results[i]=test_score
+            test_score = torch.sum(((inputs - reconstructed)**2), dim=(1, 2, 3))
+            test_results[i]=test_score.mean().item()
+
+            all_scores.append(-test_score)
+            if i==ANORMAL:
+                target = torch.zeros(len(test_score))
+            else:
+                target = torch.ones(len(test_score))
+            all_labels.append(target)
+
+    all_scores, all_labels = torch.cat(all_scores).cpu(), torch.cat(all_labels).cpu()
+    auc = roc_auc_score(all_labels, all_scores)
+
+    with open('results/roc_auc.json', 'r') as f:
+        results = json.load(f)
+    if 'cvae' not in results.keys():
+        results['cvae']={}
+    results["cvae"][f"Anormal_{ANORMAL}"] = auc
+    with open('results/roc_auc.json', 'w') as f:
+        json.dump(results, f)
 
     os.makedirs("results/figures/cvae", exist_ok=True)
 
@@ -92,16 +114,6 @@ for anormal in range(10):
 
         final_results[digit][0] = test_p_values.tolist()
         final_results[digit][1] = len(inputs_test)
-
-        ###
-        if digit==ANORMAL:
-            print(f"anormal !!!")
-        
-        n_rejets = (test_p_values < threshold).sum().item()
-        percentage_rejected = n_rejets / len(inputs_test)
-        print(f"we reject : {percentage_rejected}")
-        print(f"_________")
-        ###
 
     os.makedirs("results/p_values/cvae", exist_ok=True)
 

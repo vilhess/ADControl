@@ -7,6 +7,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import roc_auc_score
 from tqdm import trange
 import json
 import os
@@ -80,14 +81,36 @@ for normal in range(10):
     model.eval()
     test_results = {i:None for i in range(10)}
 
-    for digit in range(10):
-        test_inputs = test_dict_dataset[digit].to(DEVICE)
-        with torch.no_grad():
-            projs = model(test_inputs)
-        dist = torch.sum((projs - c) ** 2, dim=1)
-        loss = torch.mean(dist)
+    all_scores=[]
+    all_labels=[]
 
-        test_results[digit]=loss.item()
+    with torch.no_grad():
+        for digit in range(10):
+            test_inputs = test_dict_dataset[digit].to(DEVICE)
+            with torch.no_grad():
+                projs = model(test_inputs)
+            dist = torch.sum((projs - c) ** 2, dim=1)
+            loss = torch.mean(dist)
+
+            test_results[digit]=loss.item()
+
+            all_scores.append(-dist)
+            if digit==NORMAL:
+                target = torch.ones(len(dist))
+            else:
+                target = torch.zeros(len(dist))
+            all_labels.append(target)
+
+    all_scores, all_labels = torch.cat(all_scores).cpu(), torch.cat(all_labels).cpu()
+    auc = roc_auc_score(all_labels, all_scores)
+
+    with open('results/roc_auc.json', 'r') as f:
+        results = json.load(f)
+    if 'dsvdd' not in results.keys():
+        results['dsvdd']={}
+    results["dsvdd"][f"Normal_{NORMAL}"] = auc
+    with open('results/roc_auc.json', 'w') as f:
+        json.dump(results, f)
 
     os.makedirs("results/figures/deepsvdd", exist_ok=True)
 

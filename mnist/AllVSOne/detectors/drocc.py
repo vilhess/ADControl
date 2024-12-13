@@ -7,6 +7,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import roc_auc_score
 from tqdm import trange
 import json
 import os
@@ -28,7 +29,7 @@ LAMBDA=1
 RADIUS=16
 GAMMA=2
 
-for anormal in range(6, 10):
+for anormal in range(6):
 
     ANORMAL=anormal
     print(f'anormal digit = {ANORMAL}')
@@ -64,13 +65,37 @@ for anormal in range(6, 10):
     model.eval()
     test_results = {i:None for i in range(10)}
 
+    all_scores=[]
+    all_labels=[]
+
     with torch.no_grad():
         for i in range(10):
             inputs = test_dict_dataset[i].to(DEVICE)
             logits = model(inputs)
+            logits = torch.sigmoid(logits)
             score = torch.squeeze(logits).cpu()
-            score = torch.mean(score)
-            test_results[i]=score
+            test_results[i]=score.mean()
+
+            all_scores.append(score)
+            if i==ANORMAL:
+                target = torch.zeros(len(score))
+            else:
+                target = torch.ones(len(score))
+            all_labels.append(target)         
+
+
+    all_scores, all_labels = torch.cat(all_scores).cpu(), torch.cat(all_labels).cpu()
+    auc = roc_auc_score(all_labels, all_scores)
+
+    with open('results/roc_auc.json', 'r') as f:
+        results = json.load(f)
+    if 'drocc' not in results.keys():
+        results['drocc']={}
+    results["drocc"][f"Anormal_{ANORMAL}"] = auc
+    with open('results/roc_auc.json', 'w') as f:
+        json.dump(results, f)
+
+            
 
     os.makedirs("results/figures/drocc", exist_ok=True)
 

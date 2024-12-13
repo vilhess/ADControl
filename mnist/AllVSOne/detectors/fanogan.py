@@ -7,6 +7,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import roc_auc_score
 from tqdm import trange
 import json
 import os
@@ -131,26 +132,57 @@ for anormal in range(10):
             optim_encoder.step()
 
             curr_loss+=complete_loss.item()
-        pbar.set_description(f"For epoch {epoch+1}/{EPOCHS} ; loss : {curr_loss/len(trainloader)}")
+        pbar.set_description(f"For epoch {epoch+1}/{EPOCHS_ENCODER} ; loss : {curr_loss/len(trainloader)}")
 
     encoder.eval()
     f.eval()
 
     final_results = {i:None for i in range(10)}
 
+    all_scores=[]
+    all_labels=[]
+
     for i in range(10):
         test_inputs = test_dict_dataset[i].to(DEVICE)
         with torch.no_grad():
             encoded = encoder(test_inputs)
             decoded = gen(encoded)
-        loss_residual = nn.functional.mse_loss(decoded, test_inputs)
-        features_decoded = f(decoded).flatten(start_dim=1)
-        features_batch = f(test_inputs).flatten(start_dim=1)
+            features_decoded = f(decoded).flatten(start_dim=1)
+            features_batch = f(test_inputs).flatten(start_dim=1)
 
+        loss_residual = nn.functional.mse_loss(decoded, test_inputs)
         loss_discriminator = nn.functional.mse_loss(features_decoded, features_batch)
 
         complete_loss = loss_residual + loss_discriminator
         final_results[i]=complete_loss.item()
+
+        decoded = decoded.flatten(start_dim=1)
+        inputs = test_inputs.flatten(start_dim=1)
+
+        loss_residual = ((decoded - inputs)**2).sum(dim=1)
+        loss_disc = ((features_decoded - features_batch)**2).sum(dim=1)
+
+        complete_loss = loss_residual+loss_discriminator
+        score = - complete_loss
+
+        all_scores.append(score)
+        if i==ANORMAL:
+            target = torch.zeros(len(score))
+        else:
+            target = torch.ones(len(score))
+        all_labels.append(target)
+
+    all_scores, all_labels = torch.cat(all_scores).cpu(), torch.cat(all_labels).cpu()
+    auc = roc_auc_score(all_labels, all_scores)
+
+    with open('results/roc_auc.json', 'r') as file:
+        results = json.load(file)
+    if 'fanogan' not in results.keys():
+        results['fanogan']={}
+    results["fanogan"][f"Anormal_{ANORMAL}"] = auc
+    with open('results/roc_auc.json', 'w') as file:
+        json.dump(results, file)
+
 
     os.makedirs("results/figures/fanogan", exist_ok=True)
 
