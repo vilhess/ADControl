@@ -19,8 +19,8 @@ DEVICE="cuda"
 
 LR=2e-4
 BATCH_SIZE=128
-EPOCHS=20
-EPOCHS_ENCODER=10
+EPOCHS=50
+EPOCHS_ENCODER=30
 LATENT_DIM=100
 
 beta_1 = 0.5
@@ -132,7 +132,7 @@ for normal in range(10):
             optim_encoder.step()
 
             curr_loss+=complete_loss.item()
-        pbar.set_description(f"For epoch {epoch+1}/{EPOCHS} ; loss : {curr_loss/len(trainloader)}")
+        pbar.set_description(f"For epoch {epoch+1}/{EPOCHS_ENCODER} ; loss : {curr_loss/len(trainloader)}")
 
     encoder.eval()
     f.eval()
